@@ -3,63 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { margin: 0; background: #ffe4f2; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .pantalla { width: 1000px; height: 600px; border: 5px solid #ffb6c1; background: white; position: relative; }
+        body { margin: 0; background: #333; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
-        #cocina-area { background: url('cocina_fondo.png'); width: 100%; height: 100%; position: relative; }
+        /* Contenedor principal que mantiene el tamaño */
+        #game-container { width: 1000px; height: 600px; position: relative; background: white; border: 5px solid #ffb6c1; }
         
-        #pastel-base { position: absolute; top: 250px; left: 400px; width: 200px; z-index: 1; }
-        #glaseado-capa { position: absolute; top: 250px; left: 400px; width: 200px; z-index: 2; pointer-events: none; }
+        .pantalla { position: absolute; width: 100%; height: 100%; display: none; }
+        .activo { display: block; }
 
-        .barra-inferior { 
-            position: absolute; bottom: 30px; right: 30px; width: 350px; 
-            background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 20px;
-            display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;
+        /* Estilo de la Cocina (Tu imagen) */
+        #cocina { background: url('cocina_fondo.png') no-repeat center; background-size: cover; }
+        
+        /* Base del pastel y elementos */
+        #soporte-pastel { position: absolute; bottom: 150px; left: 600px; width: 250px; }
+        #pastel-base { position: absolute; bottom: 220px; left: 630px; width: 190px; z-index: 1; }
+        
+        /* Barra de materiales inferior */
+        .barra-materiales { 
+            position: absolute; bottom: 20px; right: 20px; background: rgba(255,255,255,0.8);
+            padding: 15px; border-radius: 20px; display: flex; gap: 10px;
         }
-
-        .item { width: 50px; cursor: grab; }
-        .arrastrable { position: absolute; width: 50px; cursor: move; z-index: 10; }
     </style>
 </head>
 <body>
 
-    <div id="cocina" class="pantalla">
-        <div id="cocina-area">
+    <div id="game-container">
+        <div id="inicio" class="pantalla activo" onclick="cambiarPantalla('mapa')">
+            <img src="inicio.png" style="width:100%; height:100%;">
+        </div>
+
+        <div id="mapa" class="pantalla">
+            <img src="mapa.png" style="width:100%; height:100%;">
+            <div style="position:absolute; top:200px; left:300px; width:200px; height:200px; cursor:pointer;" onclick="cambiarPantalla('cocina')"></div>
+        </div>
+
+        <div id="cocina" class="pantalla">
+            <img id="soporte-pastel" src="base_pastel.png">
             <img id="pastel-base" src="pastel_vainilla.png">
-            <img id="glaseado-capa" src="">
             
-            <div class="barra-inferior">
+            <div class="barra-materiales">
                 <img class="item" src="frasco_vainilla.png" onclick="cambiarSabor('vainilla')">
-                <img class="item" src="frasco_fresa.png" onclick="cambiarSabor('fresa')">
-                <img class="item" src="frasco_chocolate.png" onclick="cambiarSabor('chocolate')">
-                
-                <img class="item" src="manga_vainilla.png" onclick="aplicarGlaseado('vainilla')">
-                
-                <img class="item" src="gato_dec1.png" onmousedown="iniciarArrastre(event)">
-                <img class="item" src="fresa.png" onmousedown="iniciarArrastre(event)">
+                <img class="item" src="fresa.png" draggable="true">
             </div>
         </div>
     </div>
 
     <script>
+        function cambiarPantalla(id) {
+            document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activo'));
+            document.getElementById(id).classList.add('activo');
+        }
+
         function cambiarSabor(sabor) {
             document.getElementById('pastel-base').src = `pastel_${sabor}.png`;
-        }
-
-        function aplicarGlaseado(sabor) {
-            document.getElementById('glaseado-capa').src = `glaseado_${sabor}.png`;
-        }
-
-        function iniciarArrastre(e) {
-            let elemento = e.target.cloneNode(true);
-            elemento.classList.add('arrastrable');
-            document.body.appendChild(elemento);
-            
-            document.onmousemove = (e) => {
-                elemento.style.left = e.pageX - 25 + 'px';
-                elemento.style.top = e.pageY - 25 + 'px';
-            };
-            document.onmouseup = () => document.onmousemove = null;
         }
     </script>
 </body>
