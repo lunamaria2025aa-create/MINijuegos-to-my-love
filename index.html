@@ -3,47 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        #game-container { width: 1000px; height: 600px; position: relative; background: #fff; }
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
+        body { margin: 0; background: #222; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        #game-container { width: 1000px; height: 600px; position: relative; background: #fff; overflow: hidden; }
+        .screen { position: absolute; width: 100%; height: 100%; display: none; transition: transform 0.8s ease-in-out; }
         .active { display: block; }
-        
-        /* Posición del pastel sobre la base */
-        #cake-zone { position: absolute; top: 220px; left: 420px; width: 180px; z-index: 5; pointer-events: none; }
-        
-        /* Estilos de interactividad */
-        .item-drag { cursor: grab; width: 50px; position: absolute; z-index: 20; }
-        .barra-inferior { position: absolute; bottom: 20px; right: 20px; width: 400px; height: 100px; background: rgba(255,255,255,0.7); display: flex; gap: 10px; z-index: 30; }
+        .zooming { transform: scale(2.5); transform-origin: 65% 50%; } /* Ajuste de zoom hacia la pastelería */
+
+        /* 1. Botón Jugar Violeta (sobre el área que subrayaste) */
+        .btn-jugar { position: absolute; top: 78%; left: 75%; width: 150px; height: 50px; background: rgba(138, 43, 226, 0.6); border-radius: 20px; cursor: pointer; border: 2px solid white; }
+
+        /* 2. Botón "Ir a la Cocina" en el mostrador */
+        .btn-cocina { position: absolute; top: 70%; left: 40%; width: 200px; height: 50px; background: rgba(255, 182, 193, 0.8); cursor: pointer; border-radius: 10px; text-align: center; line-height: 50px; font-weight: bold; }
+
+        /* 3. Pastel sobre el soporte (posicionado donde subrayaste) */
+        #pastel-fijo { position: absolute; top: 410px; left: 355px; width: 160px; z-index: 10; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div id="game-container">
-        <div id="inicio" class="screen active" onclick="goMap()"><img src="inicio.png" style="width:100%"></div>
-        
-        <div id="mapa" class="screen" onclick="goKitchen()"><img src="mapa.png" style="width:100%"></div>
-        
-        <div id="cocina" class="screen" style="background: url('cocina_fondo.png');">
-            <img id="cake-zone" src="pastel_vainilla.png">
-            <div class="barra-inferior">
-                <img src="frasco_vainilla.png" onclick="setFlavor('vainilla')">
-                <img src="fresa.png" class="item-drag" onmousedown="startDrag(event)">
-                <img src="gato_dec1.png" class="item-drag" onmousedown="startDrag(event)">
-            </div>
+        <div id="inicio" class="screen active">
+            <img src="image_4faa5c.jpg" style="width:100%">
+            <div class="btn-jugar" onclick="cambiarPantalla('mapa')"></div>
+        </div>
+
+        <div id="mapa" class="screen">
+            <img src="image_4f9ea0.jpg" style="width:100%">
+            <div style="position:absolute; top:250px; left:330px; width:150px; height:150px; cursor:pointer;" onclick="hacerZoom()"></div>
+        </div>
+
+        <div id="mostrador" class="screen">
+            <img src="mostrador.png" style="width:100%">
+            <div class="btn-cocina" onclick="cambiarPantalla('cocina')">IR A LA COCINA</div>
+        </div>
+
+        <div id="cocina" class="screen" style="background: url('edited-image.jpg')">
+            <img id="pastel-fijo" src="pastel_vainilla.png">
         </div>
     </div>
 
     <script>
-        function goMap() { document.getElementById('inicio').classList.remove('active'); document.getElementById('mapa').classList.add('active'); }
-        function goKitchen() { document.getElementById('mapa').classList.add('zoom-efect'); setTimeout(() => { document.getElementById('mapa').classList.remove('active'); document.getElementById('cocina').classList.add('active'); }, 500); }
-        function setFlavor(flavor) { document.getElementById('cake-zone').src = `pastel_${flavor}.png`; }
-
-        function startDrag(e) {
-            let clone = e.target.cloneNode(true);
-            clone.style.position = 'absolute';
-            document.body.appendChild(clone);
-            document.onmousemove = (ev) => { clone.style.left = ev.pageX - 25 + 'px'; clone.style.top = ev.pageY - 25 + 'px'; };
-            document.onmouseup = () => { document.onmousemove = null; };
+        function cambiarPantalla(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+        function hacerZoom() {
+            document.getElementById('mapa').classList.add('zooming');
+            setTimeout(() => cambiarPantalla('mostrador'), 800);
         }
     </script>
 </body>
