@@ -1,57 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <style>
-        body { text-align: center; font-family: sans-serif; background: #fdf; }
-        .pantalla { display: none; }
-        .activo { display: block; }
-        #cocina-area { position: relative; width: 800px; height: 600px; margin: auto; background: url('cocina_fondo.png'); }
-        #pastel-base { position: absolute; top: 200px; left: 300px; width: 200px; }
-        #glaseado-capa { position: absolute; top: 200px; left: 300px; width: 200px; pointer-events: none; }
-        .frasco { cursor: pointer; width: 50px; }
+        body { margin: 0; background: #ffe4f2; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .pantalla { width: 1000px; height: 600px; border: 5px solid #ffb6c1; background: white; position: relative; }
+        
+        #cocina-area { background: url('cocina_fondo.png'); width: 100%; height: 100%; position: relative; }
+        
+        #pastel-base { position: absolute; top: 250px; left: 400px; width: 200px; z-index: 1; }
+        #glaseado-capa { position: absolute; top: 250px; left: 400px; width: 200px; z-index: 2; pointer-events: none; }
+
+        .barra-inferior { 
+            position: absolute; bottom: 30px; right: 30px; width: 350px; 
+            background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 20px;
+            display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;
+        }
+
+        .item { width: 50px; cursor: grab; }
+        .arrastrable { position: absolute; width: 50px; cursor: move; z-index: 10; }
     </style>
 </head>
 <body>
 
-    <!-- Pantalla Inicio -->
-    <div id="inicio" class="pantalla activo">
-        <h1>¡Bienvenida a tu Pastelería!</h1>
-        <button onclick="cambiarPantalla('mapa')">JUGAR</button>
-    </div>
-
-    <!-- Pantalla Mapa -->
-    <div id="mapa" class="pantalla">
-        <h1>Mapa del Juego</h1>
-        <button onclick="cambiarPantalla('mostrador')">Ir a la Pastelería</button>
-    </div>
-
-    <!-- Pantalla Mostrador -->
-    <div id="mostrador" class="pantalla">
-        <h1>Mostrador</h1>
-        <button onclick="cambiarPantalla('cocina')">Ir a la Cocina</button>
-    </div>
-
-    <!-- Pantalla Cocina -->
     <div id="cocina" class="pantalla">
         <div id="cocina-area">
             <img id="pastel-base" src="pastel_vainilla.png">
             <img id="glaseado-capa" src="">
             
-            <!-- Frascos -->
-            <img class="frasco" src="frasco_vainilla.png" onclick="cambiarSabor('vainilla')">
-            <img class="frasco" src="frasco_fresa.png" onclick="cambiarSabor('fresa')">
-            <img class="frasco" src="frasco_chocolate.png" onclick="cambiarSabor('chocolate')">
+            <div class="barra-inferior">
+                <img class="item" src="frasco_vainilla.png" onclick="cambiarSabor('vainilla')">
+                <img class="item" src="frasco_fresa.png" onclick="cambiarSabor('fresa')">
+                <img class="item" src="frasco_chocolate.png" onclick="cambiarSabor('chocolate')">
+                
+                <img class="item" src="manga_vainilla.png" onclick="aplicarGlaseado('vainilla')">
+                
+                <img class="item" src="gato_dec1.png" onmousedown="iniciarArrastre(event)">
+                <img class="item" src="fresa.png" onmousedown="iniciarArrastre(event)">
+            </div>
         </div>
     </div>
 
     <script>
-        function cambiarPantalla(id) {
-            document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activo'));
-            document.getElementById(id).classList.add('activo');
-        }
-
         function cambiarSabor(sabor) {
             document.getElementById('pastel-base').src = `pastel_${sabor}.png`;
+        }
+
+        function aplicarGlaseado(sabor) {
+            document.getElementById('glaseado-capa').src = `glaseado_${sabor}.png`;
+        }
+
+        function iniciarArrastre(e) {
+            let elemento = e.target.cloneNode(true);
+            elemento.classList.add('arrastrable');
+            document.body.appendChild(elemento);
+            
+            document.onmousemove = (e) => {
+                elemento.style.left = e.pageX - 25 + 'px';
+                elemento.style.top = e.pageY - 25 + 'px';
+            };
+            document.onmouseup = () => document.onmousemove = null;
         }
     </script>
 </body>
