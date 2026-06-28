@@ -1,56 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
     <style>
-        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #game-container { width: 1000px; height: 600px; position: relative; overflow: hidden; background: white; }
+        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        #game-container { width: 1000px; height: 600px; position: relative; background: #fff; }
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
+        .active { display: block; }
         
-        .pantalla { position: absolute; width: 100%; height: 100%; display: none; }
-        .activo { display: block; }
+        /* Posición del pastel sobre la base */
+        #cake-zone { position: absolute; top: 220px; left: 420px; width: 180px; z-index: 5; pointer-events: none; }
         
-        /* Cocina y elementos */
-        #cocina { background: url('cocina_fondo.png'); background-size: cover; }
-        #pastel-base { position: absolute; top: 220px; left: 420px; width: 180px; z-index: 5; }
-        #glaseado-capa { position: absolute; top: 220px; left: 420px; width: 180px; z-index: 6; pointer-events: none; }
-        
-        /* Barra interactiva */
-        .barra-inferior { position: absolute; bottom: 20px; right: 20px; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 15px; display: flex; gap: 10px; }
-        .draggable { cursor: grab; width: 50px; position: absolute; z-index: 10; }
+        /* Estilos de interactividad */
+        .item-drag { cursor: grab; width: 50px; position: absolute; z-index: 20; }
+        .barra-inferior { position: absolute; bottom: 20px; right: 20px; width: 400px; height: 100px; background: rgba(255,255,255,0.7); display: flex; gap: 10px; z-index: 30; }
     </style>
 </head>
 <body>
+
     <div id="game-container">
-        <div id="inicio" class="pantalla activo"><img src="inicio.png" style="width:100%"><div style="position:absolute; top:400px; left:400px; width:200px; height:100px; cursor:pointer;" onclick="cambiarPantalla('mapa')"></div></div>
-        <div id="mapa" class="pantalla"><img src="mapa.png" style="width:100%"><div style="position:absolute; top:150px; left:300px; width:300px; height:200px; cursor:pointer;" onclick="cambiarPantalla('cocina')"></div></div>
+        <div id="inicio" class="screen active" onclick="goMap()"><img src="inicio.png" style="width:100%"></div>
         
-        <div id="cocina" class="pantalla">
-            <img id="pastel-base" src="pastel_vainilla.png">
-            <img id="glaseado-capa" src="">
-            
+        <div id="mapa" class="screen" onclick="goKitchen()"><img src="mapa.png" style="width:100%"></div>
+        
+        <div id="cocina" class="screen" style="background: url('cocina_fondo.png');">
+            <img id="cake-zone" src="pastel_vainilla.png">
             <div class="barra-inferior">
-                <img src="frasco_vainilla.png" onclick="cambiarSabor('vainilla')">
-                <img src="frasco_chocolate.png" onclick="cambiarSabor('chocolate')">
-                <img src="fresa.png" class="draggable" onmousedown="empezarArrastre(event)">
+                <img src="frasco_vainilla.png" onclick="setFlavor('vainilla')">
+                <img src="fresa.png" class="item-drag" onmousedown="startDrag(event)">
+                <img src="gato_dec1.png" class="item-drag" onmousedown="startDrag(event)">
             </div>
         </div>
     </div>
 
     <script>
-        function cambiarPantalla(id) {
-            document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activo'));
-            document.getElementById(id).classList.add('activo');
-        }
-        function cambiarSabor(sabor) {
-            document.getElementById('pastel-base').src = `pastel_${sabor}.png`;
-        }
-        function empezarArrastre(e) {
-            let elemento = e.target.cloneNode(true);
-            document.getElementById('cocina').appendChild(elemento);
-            document.onmousemove = (ev) => {
-                elemento.style.left = ev.pageX - 25 + 'px';
-                elemento.style.top = ev.pageY - 25 + 'px';
-            };
-            document.onmouseup = () => document.onmousemove = null;
+        function goMap() { document.getElementById('inicio').classList.remove('active'); document.getElementById('mapa').classList.add('active'); }
+        function goKitchen() { document.getElementById('mapa').classList.add('zoom-efect'); setTimeout(() => { document.getElementById('mapa').classList.remove('active'); document.getElementById('cocina').classList.add('active'); }, 500); }
+        function setFlavor(flavor) { document.getElementById('cake-zone').src = `pastel_${flavor}.png`; }
+
+        function startDrag(e) {
+            let clone = e.target.cloneNode(true);
+            clone.style.position = 'absolute';
+            document.body.appendChild(clone);
+            document.onmousemove = (ev) => { clone.style.left = ev.pageX - 25 + 'px'; clone.style.top = ev.pageY - 25 + 'px'; };
+            document.onmouseup = () => { document.onmousemove = null; };
         }
     </script>
 </body>
